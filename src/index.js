@@ -44,10 +44,13 @@ function _set(key, val, tgt) {
         if (!tgt[path[i]]) {
             Vue.set(tgt, path[i], {});
         }
+        
+        if (isPrototypePolluted(path[i]))
+            continue;
 
         tgt = tgt[path[i]];
     }
-
+    
     if (_isObj(tgt[key]) && _isObj(val)) {
         _merge(tgt[key], val);
 
@@ -80,6 +83,15 @@ function _get(key, tgt) {
     }
 
     return tgt;
+}
+
+/**
+ * Blacklist certain keys to prevent Prototype Pollution
+ * 
+ * @param string key 
+ */
+function isPrototypePolluted(key) {
+    return ['__proto__', 'constructor', 'prototype'].includes(key);
 }
 
 module.exports = {
